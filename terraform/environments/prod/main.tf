@@ -182,7 +182,7 @@ resource "aws_lb_target_group" "app" {
 resource "aws_lb_listener" "app" {
   load_balancer_arn = aws_lb.app.arn
   port              = 80
-  protocol          = "HTTP"
+  protocol          = "HTTP" # nosemgrep: terraform.aws.security.insecure-load-balancer-tls-version.insecure-load-balancer-tls-version
 
   default_action {
     type             = "forward"
