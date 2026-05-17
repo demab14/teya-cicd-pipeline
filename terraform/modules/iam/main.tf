@@ -10,11 +10,9 @@ resource "aws_iam_role" "github_actions" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Effect = "Allow"
-      Principal = {
-        Federated = aws_iam_openid_connect_provider.github.arn
-      }
-      Action = "sts:AssumeRoleWithWebIdentity"
+      Effect    = "Allow"
+      Principal = { Federated = aws_iam_openid_connect_provider.github.arn }
+      Action    = "sts:AssumeRoleWithWebIdentity"
       Condition = {
         StringEquals = {
           "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
@@ -40,7 +38,7 @@ resource "aws_iam_role_policy" "github_actions" {
         Sid      = "ECRAuth"
         Effect   = "Allow"
         Action   = ["ecr:GetAuthorizationToken"]
-        Resource = "*"
+        Resource = var.ecr_repository_arn
       },
       {
         Sid    = "ECRPush"
@@ -66,7 +64,7 @@ resource "aws_iam_role_policy" "github_actions" {
           "ecs:UpdateService",
           "ecs:DescribeServices"
         ]
-        Resource = "*"
+        Resource = var.ecs_cluster_arn
       },
       {
         Sid      = "PassRoleToECS"
@@ -80,5 +78,5 @@ resource "aws_iam_role_policy" "github_actions" {
 
 output "github_actions_role_arn" {
   value       = aws_iam_role.github_actions.arn
-  description = "Add this as AWS_OIDC_ROLE_ARN in GitHub secrets"
+  description = "Add this as AWS_OIDC_ROLE_ARN in GitHub repository secrets"
 }

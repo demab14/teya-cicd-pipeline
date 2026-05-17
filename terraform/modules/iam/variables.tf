@@ -18,6 +18,11 @@ variable "ecs_task_execution_role_arn" {
   type = string
 }
 
+variable "ecs_cluster_arn" {
+  type        = string
+  description = "ECS cluster ARN to scope deployment permissions"
+}
+
 variable "tags" {
   type    = map(string)
   default = {}

@@ -1,17 +1,21 @@
+resource "aws_kms_key" "logs" {
+  description             = "KMS key for CloudWatch log encryption"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+  tags                    = var.tags
+}
+
 resource "aws_ecs_cluster" "main" {
   name = var.cluster_name
-
   setting {
     name  = "containerInsights"
     value = "enabled"
   }
-
   tags = var.tags
 }
 
 resource "aws_iam_role" "ecs_task_execution" {
   name = "${var.name}-ecs-task-execution-role"
-
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -20,7 +24,6 @@ resource "aws_iam_role" "ecs_task_execution" {
       Action    = "sts:AssumeRole"
     }]
   })
-
   tags = var.tags
 }
 
@@ -35,6 +38,7 @@ resource "aws_security_group" "ecs_tasks" {
   vpc_id      = var.vpc_id
 
   ingress {
+    description     = "Allow inbound from ALB"
     from_port       = var.container_port
     to_port         = var.container_port
     protocol        = "tcp"
@@ -42,9 +46,10 @@ resource "aws_security_group" "ecs_tasks" {
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    description = "Allow HTTPS outbound for ECR and AWS APIs"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -63,20 +68,9 @@ resource "aws_ecs_task_definition" "app" {
     name      = var.container_name
     image     = var.container_image
     essential = true
-
-    portMappings = [{
-      containerPort = var.container_port
-      protocol      = "tcp"
-    }]
-
+    portMappings = [{ containerPort = var.container_port, protocol = "tcp" }]
     readonlyRootFilesystem = true
-
-    linuxParameters = {
-      capabilities = {
-        drop = ["ALL"]
-      }
-    }
-
+    linuxParameters = { capabilities = { drop = ["ALL"] } }
     logConfiguration = {
       logDriver = "awslogs"
       options = {
@@ -86,13 +80,13 @@ resource "aws_ecs_task_definition" "app" {
       }
     }
   }])
-
   tags = var.tags
 }
 
 resource "aws_cloudwatch_log_group" "ecs" {
   name              = "/ecs/${var.name}"
-  retention_in_days = 30
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.logs.arn
   tags              = var.tags
 }
 
@@ -117,12 +111,11 @@ resource "aws_ecs_service" "app" {
 
   deployment_minimum_healthy_percent = 100
   deployment_maximum_percent         = 200
-
-  depends_on = [var.alb_listener_arn]
-
-  tags = var.tags
+  depends_on                         = [var.alb_listener_arn]
+  tags                               = var.tags
 }
 
 output "cluster_name"            { value = aws_ecs_cluster.main.name }
+output "cluster_arn"             { value = aws_ecs_cluster.main.arn }
 output "service_name"            { value = aws_ecs_service.app.name }
 output "task_execution_role_arn" { value = aws_iam_role.ecs_task_execution.arn }

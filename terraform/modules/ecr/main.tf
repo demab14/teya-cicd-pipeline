@@ -1,3 +1,10 @@
+resource "aws_kms_key" "ecr" {
+  description             = "KMS key for ECR repository encryption"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+  tags                    = var.tags
+}
+
 resource "aws_ecr_repository" "app" {
   name                 = var.repository_name
   image_tag_mutability = "IMMUTABLE"
@@ -7,7 +14,8 @@ resource "aws_ecr_repository" "app" {
   }
 
   encryption_configuration {
-    encryption_type = "AES256"
+    encryption_type = "KMS"
+    kms_key         = aws_kms_key.ecr.arn
   }
 
   tags = var.tags
@@ -44,10 +52,5 @@ resource "aws_ecr_lifecycle_policy" "app" {
   })
 }
 
-output "repository_url" {
-  value = aws_ecr_repository.app.repository_url
-}
-
-output "repository_arn" {
-  value = aws_ecr_repository.app.arn
-}
+output "repository_url" { value = aws_ecr_repository.app.repository_url }
+output "repository_arn" { value = aws_ecr_repository.app.arn }
