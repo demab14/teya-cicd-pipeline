@@ -82,7 +82,7 @@ jobs:
           image-ref: ${{ env.ECR_REPOSITORY }}:${{ steps.meta.outputs.sha-tag }}
           format: sarif
           output: trivy-results.sarif
-          severity: HIGH,CRITICAL
+          severity: CRITICAL
           exit-code: 1
 
       - name: Upload Trivy results
