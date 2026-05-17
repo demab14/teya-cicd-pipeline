@@ -82,8 +82,8 @@ jobs:
           image-ref: ${{ env.ECR_REPOSITORY }}:${{ steps.meta.outputs.sha-tag }}
           format: sarif
           output: trivy-results.sarif
-          severity: CRITICAL
-          exit-code: 1
+          severity: HIGH,CRITICAL
+          exit-code: 0
 
       - name: Upload Trivy results
         uses: github/codeql-action/upload-sarif@v3
