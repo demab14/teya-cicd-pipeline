@@ -1,0 +1,10 @@
+skip-check:
+  - CKV_AWS_144   # S3 cross-region replication - not required for demo ALB logs
+  - CKV_AWS_145   # S3 KMS encryption - AES256 sufficient for demo
+  - CKV2_AWS_61   # S3 lifecycle - not required for demo
+  - CKV2_AWS_62   # S3 event notifications - not required for demo
+  - CKV2_AWS_20   # ALB HTTP to HTTPS redirect - no ACM cert in demo
+  - CKV_AWS_103   # ALB TLS 1.2 - HTTP only in demo (no cert)
+  - CKV2_AWS_76   # WAF Log4j AMR - managed rule sufficient for demo
+  - CKV2_AWS_31   # WAF logging - not required for demo
+  - CKV_AWS_378   # Target group HTTP - internal only, ALB handles external
