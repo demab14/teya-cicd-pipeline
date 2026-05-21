@@ -38,7 +38,7 @@ resource "aws_iam_role_policy" "github_actions" {
         Sid      = "ECRAuth"
         Effect   = "Allow"
         Action   = ["ecr:GetAuthorizationToken"]
-        Resource = var.ecr_repository_arn
+        Resource = "*"
       },
       {
         Sid    = "ECRPush"
