@@ -88,12 +88,16 @@ resource "aws_wafv2_web_acl" "alb" {
   name  = "${local.name}-waf"
   scope = "REGIONAL"
 
-  default_action { allow {} }
+  default_action {
+    allow {}
+  }
 
   rule {
     name     = "AWSManagedRulesCommonRuleSet"
     priority = 1
-    override_action { none {} }
+    override_action {
+      none {}
+    }
     statement {
       managed_rule_group_statement {
         name        = "AWSManagedRulesCommonRuleSet"
@@ -118,7 +122,7 @@ resource "aws_wafv2_web_acl" "alb" {
 
 resource "aws_security_group" "alb" {
   name        = "${local.name}-alb-sg"
-  description = "ALB security group — allow HTTP inbound"
+  description = "ALB security group - allow HTTP inbound"
   vpc_id      = module.vpc.vpc_id
 
   ingress {
