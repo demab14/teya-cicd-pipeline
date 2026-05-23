@@ -16,3 +16,4 @@ A production-grade DevSecOps pipeline with security embedded at every stage.
 - ECS tasks in private subnets
 - Read-only filesystem + all Linux caps dropped
 - SBOM generated per build (PCI-DSS audit trail)
+triggered
