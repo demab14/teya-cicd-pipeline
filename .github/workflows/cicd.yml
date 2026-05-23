@@ -16,7 +16,7 @@ env:
   ECR_REPOSITORY: teya-demo-app
   ECS_CLUSTER: teya-demo-cluster
   ECS_SERVICE: teya-demo-service
-  CONTAINER_NAME: teya-demo-app
+  CONTAINER_NAME: app
 
 jobs:
 
